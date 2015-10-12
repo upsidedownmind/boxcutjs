@@ -2,62 +2,106 @@ function log(w) {
     console.log(w);
 }
 
-// corte = numero, y el numero es la cantidad
-
-var placa = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-
-var cortes = [1,2,3,4,20]
-
-function indexLibre(placa) {
+//crear corte, una corte es un rectangulo.
+function crearCorte(largo, ancho, contenido) {
     
-    for (var i = 0; i < placa.length; i++) {
-		if(placa[i] == 0) {
-            return i;
+    var superficie = new Array(largo);
+ 
+    for (var i = 0; i < largo; i++) {
+        for (var j = 0; j < ancho; j++) {
+            if(superficie[i] == undefined) superficie[i] = new Array(ancho);
+
+            superficie[i][j] = contenido;
         }
-    }  
-    
-    return -1;
-
-}
-
-function cantidadLibre(placa, index) {
-    var acc = 0;
-    for (var i = index; i < placa.length; i++) {
-        if( placa[i] != 0) {
-            break;
-        } 
-        acc++;
     }
 
-    return acc;
+   
+    return {
+        largo: largo,
+        ancho: ancho,
+        contenido: contenido,
+        superficie: superficie
+    }; 
 }
 
-function aplicarCorte(corte, placa) {
+//// una placa puede tener varios tamaños (puede ser recorte), pero siempre es rectangular
+function crearPlaca(largo, ancho) {
 
-    log('aplicar corte: ' + corte);
+    var disponible = 0;
+    var ocupado = 1;
 
-    var index = indexLibre(placa);
-    
-    if(index == -1) {
-        log('placa llena');
+    //una placa es una forma de recorte:
+    var placa = crearCorte(largo, ancho, disponible);
+   
+    //con algunas cosas mas:
+    placa.cortes = [];
+    placa.estaDisponible = function(x,y) {
+        if(x<0 || x >= largo) {
+            return false;
+        }
+        if(y<0 || y >= ancho) {
+            return false;
+        }
+        
+        return placa.superficie[x][y] == disponible;
+    };
+
+    //busca dispo a partir de una posicion,  da {x:x, y:y} o false
+    placa.buscarAreaDisponibleDesde = function(x,y) {
+
+        for (var i = x; i < largo; i++) {
+            for (var j = y; j < ancho; j++) {
+                if(placa.estaDisponible(i,j)) {
+                    return {x: i, y: j};
+                }
+            }
+
+        }
+
         return false;
-    }
-    
-    if( cantidadLibre(placa, index) < corte){
-        log('sin espacio')
-        return false;
-    }
-    
-    for (var i = index; i < (index + corte); i++) {
-        placa[i] = corte; 
-    }
-    
-    return true;
+    };
+
+    //aplicar corte
+    placa.aplicarCorte = function(corte, x, y) {
+        
+        for (var i = x; i < (x + corte.largo); i++) {
+            for (var j = y; j < ( y + corte.ancho); j++) {
+                placa.superficie[i][j] = corte.contenido;
+            }
+        }
+
+        placa.cortes.push(corte);
+
+        return placa;
+    };
+
+    return placa;
 }
 
-for (var i = 0; i < cortes.length; i++) {
-    var resultado = aplicarCorte(cortes[i], placa)
-    log('Resultado: ' + resultado)
-    log(placa)
+//// esto ve si encaja y da {x:x, y:y} o false
+/// aca va todo la logica de donde poner el corte, y como es complejo, queda fuera del objeto placa
+function verSiEncaja(corte, placa) {
+
+    var dispo = placa.buscarAreaDisponibleDesde(0,0);
     
+    if(!dispo) return false;
+
+    
+    return dispo;
+
+}
+
+//el caso mas simple:
+var placa = crearPlaca(10, 10);
+var corte = crearCorte(4, 4, 1);
+
+log(placa)
+log(corte)
+
+var encaja = verSiEncaja(corte, placa);
+
+log(encaja);
+
+if(encaja) {
+    log( placa.aplicarCorte(corte, encaja.x, encaja.y))
 }
