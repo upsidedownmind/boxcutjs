@@ -52,14 +52,14 @@ function crearCorte(ancho, largo, contenido) {
     rec.superficie = superficie;
 
     rec.contenidoEn = function(punto) {
-        if(punto.x<0 || punto.x >= ancho) {
+        if(punto.x<0 || punto.x >= rec.ancho) {
             return false;
         }
-        if(punto.y<0 || punto.y >= largo) {
+        if(punto.y<0 || punto.y >= rec.largo) {
             return false;
         }
 
-        return superficie[punto.x][punto.y];
+        return rec.superficie[punto.x][punto.y];
     };
 
     return rec; 
@@ -96,11 +96,13 @@ function crearPlaca( ancho, largo ) {
         return false;
     };
 
-    placa.existeAreaDisponibleDesde = function(p, area) {
+    //test sobre el area q se quiere escribir
+    placa.existeAreaDisponibleDesde = function(p, rect) {
 
-        for (var i = p.x; i < (p.x + area.ancho); i++) {
-            for (var j = p.y; j < ( p.y + area.largo); j++) {
-                if(!placa.estaDisponible( punto(i,j) )) {
+        for (var x = p.x; x < (p.x + rect.ancho); x++) {
+            for (var y = p.y; y < ( p.y + rect.largo); y++) {
+                var p1 = punto(x,y);
+                if(!placa.estaDisponible( p1 )) {
                     return false;
                 }
             }
@@ -157,7 +159,7 @@ var placa = crearPlaca(8, 10);
 
 graficarCorte(placa);
 
-var cortes = [ crearCorte(4, 2, 1),  crearCorte(4, 5, 2), crearCorte(3, 3, 3)];
+var cortes = [ crearCorte(4, 2, 1),  crearCorte(4, 5, 2), crearCorte(3, 3, 3), crearCorte(3,3,5), crearCorte(3,3,6), crearCorte(1,5,7) ];
 
 /// por cada corte:
 cortes.forEach(function(corte){
@@ -176,9 +178,16 @@ cortes.forEach(function(corte){
 
 });
 log('============')
-var testPunto = punto(6,0)
+var testPunto = punto(4,0)
 log(placa.superficie[testPunto.x][testPunto.y])
 log(placa.contenidoEn( testPunto ))
 log(placa.estaDisponible( testPunto ))
-log(placa.buscarPuntoDisponibleDesde(testPunto.x, testPunto.y))
-//log(placa.existeAreaDisponibleDesde(punto(0,6), crearCorte(3, 3, 3)) )
+log(placa.buscarPuntoDisponibleDesde(testPunto))
+log(placa.existeAreaDisponibleDesde(testPunto, crearCorte(3, 3, 3)) )
+
+log(placa.buscarPuntoDisponibleDesde( punto(1,0) ))
+
+placa.superficie[testPunto.x][testPunto.y] = 'X'
+//placa.aplicarCorte(crearCorte(3,3,'y'), punto(4,5))
+
+    graficarCorte(placa);
