@@ -25,7 +25,7 @@ function punto(x, y) {
 
 // crea un rectangulo, largo: y, ancho: x
 function crearRectangulo(ancho, largo) {
-    
+
     return {
         ancho: ancho,
         largo: largo
@@ -35,11 +35,11 @@ function crearRectangulo(ancho, largo) {
 //crear corte, una corte es un rectangulo. , largo: y, ancho: x
 function crearCorte(ancho, largo, contenido) {
     
-    var superficie = new Array(largo);
+    var superficie = [];
  
     for (var x = 0; x < ancho; x++) {
         for (var y = 0; y < largo; y++) {
-            if(superficie[x] == undefined) superficie[x] = new Array(ancho);
+            if(superficie[x] == undefined) superficie[x] = [];
 
             superficie[x][y] = contenido;
         }
@@ -51,6 +51,17 @@ function crearCorte(ancho, largo, contenido) {
     rec.contenido = contenido;
     rec.superficie = superficie;
 
+    rec.contenidoEn = function(punto) {
+        if(punto.x<0 || punto.x >= ancho) {
+            return false;
+        }
+        if(punto.y<0 || punto.y >= largo) {
+            return false;
+        }
+
+        return superficie[punto.x][punto.y];
+    };
+
     return rec; 
 }
 
@@ -58,22 +69,14 @@ function crearCorte(ancho, largo, contenido) {
 function crearPlaca( ancho, largo ) {
 
     var disponible = 0;
-    var ocupado = 1;
-
+    
     //una placa es una forma de recorte:
     var placa = crearCorte(ancho, largo, disponible);
    
     //con algunas cosas mas:
     placa.cortes = [];
-    placa.estaDisponible = function(x,y) {
-        if(x<0 || x >= ancho) {
-            return false;
-        }
-        if(y<0 || y >= largo) {
-            return false;
-        }
-        
-        return placa.superficie[x][y] == disponible;
+    placa.estaDisponible = function( punto ) {
+        return placa.contenidoEn(punto) === disponible;
     };
 
     //busca dispo a partir de una posicion,  da un punto o false
@@ -81,8 +84,10 @@ function crearPlaca( ancho, largo ) {
 
         for (var x = p.x; x < ancho; x++) {
             for (var y = p.y; y < largo; y++) {
-                if(placa.estaDisponible(x, y)) {
-                    return punto(x, y);
+                var p1 = punto(x, y);
+
+                if(placa.estaDisponible( p1 )) {
+                    return p1;
                 }
             }
 
@@ -91,11 +96,11 @@ function crearPlaca( ancho, largo ) {
         return false;
     };
 
-    placa.existeAreaDisponibleDesde = function(punto, area) {
+    placa.existeAreaDisponibleDesde = function(p, area) {
 
-        for (var i = punto.x; i < (punto.x + area.ancho); i++) {
-            for (var j = punto.y; j < ( punto.y + area.largo); j++) {
-                if(!placa.estaDisponible(i,j)) {
+        for (var i = p.x; i < (p.x + area.ancho); i++) {
+            for (var j = p.y; j < ( p.y + area.largo); j++) {
+                if(!placa.estaDisponible( punto(i,j) )) {
                     return false;
                 }
             }
@@ -171,6 +176,9 @@ cortes.forEach(function(corte){
 
 });
 log('============')
-log(placa.superficie[6][0])
-log(placa.buscarPuntoDisponibleDesde(0,0))
-log(placa.existeAreaDisponibleDesde(punto(0,6), crearCorte(3, 3, 3)) )
+var testPunto = punto(6,0)
+log(placa.superficie[testPunto.x][testPunto.y])
+log(placa.contenidoEn( testPunto ))
+log(placa.estaDisponible( testPunto ))
+log(placa.buscarPuntoDisponibleDesde(testPunto.x, testPunto.y))
+//log(placa.existeAreaDisponibleDesde(punto(0,6), crearCorte(3, 3, 3)) )
