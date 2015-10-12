@@ -6,7 +6,7 @@ function log(w) {
 
 var placa = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-var cortes = [1,2,3,4,2]
+var cortes = [1,2,3,4,20]
 
 function indexLibre(placa) {
     
@@ -14,7 +14,7 @@ function indexLibre(placa) {
 		if(placa[i] == 0) {
             return i;
         }
-	}  
+    }  
     
     return -1;
 
@@ -33,14 +33,18 @@ function cantidadLibre(placa, index) {
 }
 
 function aplicarCorte(corte, placa) {
-    
+
+    log('aplicar corte: ' + corte);
+
     var index = indexLibre(placa);
     
     if(index == -1) {
+        log('placa llena');
         return false;
     }
     
     if( cantidadLibre(placa, index) < corte){
+        log('sin espacio')
         return false;
     }
     
@@ -53,6 +57,7 @@ function aplicarCorte(corte, placa) {
 
 for (var i = 0; i < cortes.length; i++) {
     var resultado = aplicarCorte(cortes[i], placa)
+    log('Resultado: ' + resultado)
     log(placa)
-    log(resultado)
+    
 }
