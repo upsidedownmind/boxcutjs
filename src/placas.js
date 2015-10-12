@@ -137,10 +137,16 @@ function verSiEncaja(corte, placa) {
         // inicia en
         var p = placa.buscarPuntoDisponibleDesde( punto(0,y) );
 
+
         //tiene que encajar
-        if(p && placa.existeAreaDisponibleDesde(p, corte)) {
-                
-           return p;
+        if( p ) {
+
+            for (var x = p.x; y < placa.ancho; x++) {
+               var p1 = punto(x,p.y);
+               if( placa.existeAreaDisponibleDesde(p1, corte)) {
+                   return p1;
+               }
+            } 
             
         }
     } 
@@ -159,7 +165,13 @@ var placa = crearPlaca(8, 10);
 
 graficarCorte(placa);
 
-var cortes = [ crearCorte(4, 2, 1),  crearCorte(4, 5, 2), crearCorte(3, 3, 3), crearCorte(3,3,5), crearCorte(3,3,6), crearCorte(1,5,7) ];
+var cortes = [ 
+    crearCorte(4, 2, 1),  
+    crearCorte(4, 5, 2), 
+    crearCorte(3, 3, 3), 
+    crearCorte(3,3,5), 
+    crearCorte(3,3,6), 
+    crearCorte(2,5,7) ];
 
 /// por cada corte:
 cortes.forEach(function(corte){
