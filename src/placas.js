@@ -2,6 +2,19 @@ function log(w) {
     console.log(w);
 }
 
+function graficarCorte(corte) {
+    log('----------------')
+    log('ancho: ' + corte.ancho + ', largo: '+ corte.largo);
+    
+    for (var y = 0; y < corte.largo; y++) {
+        var linea = ' ';
+        for (var x = 0; x < corte.ancho; x++) {
+            linea += corte.superficie[x][y] + ' ';
+        }
+        log(linea)
+    }
+}
+
 //crea un punto
 function punto(x, y) {
     return {
@@ -24,8 +37,8 @@ function crearCorte(ancho, largo, contenido) {
     
     var superficie = new Array(largo);
  
-    for (var y = 0; y < ancho; y++) {
-        for (var x = 0; x < largo; x++) {
+    for (var x = 0; x < ancho; x++) {
+        for (var y = 0; y < largo; y++) {
             if(superficie[x] == undefined) superficie[x] = new Array(ancho);
 
             superficie[x][y] = contenido;
@@ -66,10 +79,10 @@ function crearPlaca( ancho, largo ) {
     //busca dispo a partir de una posicion,  da un punto o false
     placa.buscarPuntoDisponibleDesde = function( p ) {
 
-        for (var i = p.x; i < ancho; i++) {
-            for (var j = p.y; j < largo; j++) {
-                if(placa.estaDisponible(i,j)) {
-                    return punto(i, j);
+        for (var x = p.x; x < ancho; x++) {
+            for (var y = p.y; y < largo; y++) {
+                if(placa.estaDisponible(x, y)) {
+                    return punto(x, y);
                 }
             }
 
@@ -137,7 +150,7 @@ function verSiEncaja(corte, placa) {
 //el caso mas simple:
 var placa = crearPlaca(8, 10);
 
-log(placa)
+graficarCorte(placa);
 
 var cortes = [ crearCorte(4, 2, 1),  crearCorte(4, 5, 2), crearCorte(3, 3, 3)];
 
@@ -146,17 +159,18 @@ cortes.forEach(function(corte){
 
     log('-----------------')
 
-    log(corte)
+    graficarCorte(corte);
 
     encaja = verSiEncaja(corte, placa);
 
     log(encaja);
 
     if(encaja) {
-        log( placa.aplicarCorte(corte, encaja))
+        graficarCorte( placa.aplicarCorte(corte, encaja))
     }
 
 });
-
-
+log('============')
+log(placa.superficie[6][0])
+log(placa.buscarPuntoDisponibleDesde(0,0))
 log(placa.existeAreaDisponibleDesde(punto(0,6), crearCorte(3, 3, 3)) )
