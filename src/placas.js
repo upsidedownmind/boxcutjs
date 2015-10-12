@@ -10,7 +10,7 @@ function punto(x, y) {
     }
 }
 
-// crea un rectangulo
+// crea un rectangulo, largo: x, ancho: y
 function crearRectangulo(largo, ancho) {
     
     return {
@@ -108,32 +108,50 @@ function crearPlaca(largo, ancho) {
     return placa;
 }
 
-//// esto ve si encaja y da {x:x, y:y} o false
+//// esto ve si encaja y da un punto o false
 /// aca va todo la logica de donde poner el corte, y como es complejo, queda fuera del objeto placa
 function verSiEncaja(corte, placa) {
 
-    // inicia en
-    var p = placa.buscarPuntoDisponibleDesde( punto(0,0) );
-    
-    if(!p) return false;
+    //busco a lo ancho
+    var disponible = false;
+    var y = 0;
 
-    //tiene que encajar
-    if(!placa.existeAreaDisponibleDesde(p, corte)) {
-        return false
-    }
+    do {
+
+        // inicia en
+        var p = placa.buscarPuntoDisponibleDesde( punto(0,y) );
+        
+        if(p) {
+            //tiene que encajar
+            if(placa.existeAreaDisponibleDesde(p, corte)) {
+                
+                disponible = p;
+            }
+        }
+
+        y++;
+
+    } while(!disponible && y < placa.largo)
+    
+
+    
 
     //TODO: poner logica compleja...
     
-    return p;
+    return disponible;
 
 }
+
+
+////////////////////////////////////
+/////////////////////////////////
 
 //el caso mas simple:
 var placa = crearPlaca(10, 10);
 
 log(placa)
 
-var cortes = [ crearCorte(4, 4, 1),  crearCorte(5, 5, 2), crearCorte(10, 10, 3)];
+var cortes = [ crearCorte(4, 4, 1),  crearCorte(5, 5, 2), crearCorte(3, 3, 3)];
 
 /// por cada corte:
 cortes.forEach(function(corte){
