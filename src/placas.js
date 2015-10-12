@@ -159,4 +159,4 @@ cortes.forEach(function(corte){
 });
 
 
-log(placa.existeAreaDisponibleDesde(punto(6,6), crearCorte(3, 3, 3)) )
+log(placa.existeAreaDisponibleDesde(punto(0,6), crearCorte(3, 3, 3)) )
