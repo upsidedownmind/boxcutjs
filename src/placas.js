@@ -7,33 +7,33 @@ function punto(x, y) {
     return {
         x: x,
         y: y
-    }
+    };
 }
 
-// crea un rectangulo, largo: x, ancho: y
-function crearRectangulo(largo, ancho) {
+// crea un rectangulo, largo: y, ancho: x
+function crearRectangulo(ancho, largo) {
     
     return {
-        largo: largo,
-        ancho: ancho
+        ancho: ancho,
+        largo: largo
     }; 
 }
 
-//crear corte, una corte es un rectangulo.
-function crearCorte(largo, ancho, contenido) {
+//crear corte, una corte es un rectangulo. , largo: y, ancho: x
+function crearCorte(ancho, largo, contenido) {
     
     var superficie = new Array(largo);
  
-    for (var i = 0; i < largo; i++) {
-        for (var j = 0; j < ancho; j++) {
-            if(superficie[i] == undefined) superficie[i] = new Array(ancho);
+    for (var y = 0; y < ancho; y++) {
+        for (var x = 0; x < largo; x++) {
+            if(superficie[x] == undefined) superficie[x] = new Array(ancho);
 
-            superficie[i][j] = contenido;
+            superficie[x][y] = contenido;
         }
     }
 
     // el corte es un rectangulo con relleno
-    var rec = crearRectangulo(largo, ancho);
+    var rec = crearRectangulo(ancho, largo);
 
     rec.contenido = contenido;
     rec.superficie = superficie;
@@ -41,22 +41,22 @@ function crearCorte(largo, ancho, contenido) {
     return rec; 
 }
 
-//// una placa puede tener varios tamaños (puede ser recorte), pero siempre es rectangular
-function crearPlaca(largo, ancho) {
+//// una placa puede tener varios tamaños (puede ser recorte), pero siempre es rectangular. , largo: y, ancho: x
+function crearPlaca( ancho, largo ) {
 
     var disponible = 0;
     var ocupado = 1;
 
     //una placa es una forma de recorte:
-    var placa = crearCorte(largo, ancho, disponible);
+    var placa = crearCorte(ancho, largo, disponible);
    
     //con algunas cosas mas:
     placa.cortes = [];
     placa.estaDisponible = function(x,y) {
-        if(x<0 || x >= largo) {
+        if(x<0 || x >= ancho) {
             return false;
         }
-        if(y<0 || y >= ancho) {
+        if(y<0 || y >= largo) {
             return false;
         }
         
@@ -66,8 +66,8 @@ function crearPlaca(largo, ancho) {
     //busca dispo a partir de una posicion,  da un punto o false
     placa.buscarPuntoDisponibleDesde = function( p ) {
 
-        for (var i = p.x; i < largo; i++) {
-            for (var j = p.y; j < ancho; j++) {
+        for (var i = p.x; i < ancho; i++) {
+            for (var j = p.y; j < largo; j++) {
                 if(placa.estaDisponible(i,j)) {
                     return punto(i, j);
                 }
@@ -80,8 +80,8 @@ function crearPlaca(largo, ancho) {
 
     placa.existeAreaDisponibleDesde = function(punto, area) {
 
-        for (var i = punto.x; i < (punto.x + area.largo); i++) {
-            for (var j = punto.y; j < ( punto.y + area.ancho); j++) {
+        for (var i = punto.x; i < (punto.x + area.ancho); i++) {
+            for (var j = punto.y; j < ( punto.y + area.largo); j++) {
                 if(!placa.estaDisponible(i,j)) {
                     return false;
                 }
@@ -94,8 +94,8 @@ function crearPlaca(largo, ancho) {
     //aplicar corte
     placa.aplicarCorte = function(corte, punto) {
         
-        for (var i = punto.x; i < (punto.x + corte.largo); i++) {
-            for (var j = punto.y; j < ( punto.y + corte.ancho); j++) {
+        for (var i = punto.x; i < (punto.x + corte.ancho); i++) {
+            for (var j = punto.y; j < ( punto.y + corte.largo); j++) {
                 placa.superficie[i][j] = corte.contenido;
             }
         }
@@ -113,32 +113,20 @@ function crearPlaca(largo, ancho) {
 function verSiEncaja(corte, placa) {
 
     //busco a lo ancho
-    var disponible = false;
-    var y = 0;
-
-    do {
-
+    for (var y = 0; y < placa.largo; y++) {
         // inicia en
         var p = placa.buscarPuntoDisponibleDesde( punto(0,y) );
-        
-        if(p) {
-            //tiene que encajar
-            if(placa.existeAreaDisponibleDesde(p, corte)) {
+
+        //tiene que encajar
+        if(p && placa.existeAreaDisponibleDesde(p, corte)) {
                 
-                disponible = p;
-            }
+           return p;
+            
         }
-
-        y++;
-
-    } while(!disponible && y < placa.largo)
+    } 
     
-
-    
-
     //TODO: poner logica compleja...
-    
-    return disponible;
+    return false;
 
 }
 
@@ -147,11 +135,11 @@ function verSiEncaja(corte, placa) {
 /////////////////////////////////
 
 //el caso mas simple:
-var placa = crearPlaca(10, 10);
+var placa = crearPlaca(8, 10);
 
 log(placa)
 
-var cortes = [ crearCorte(4, 4, 1),  crearCorte(5, 5, 2), crearCorte(3, 3, 3)];
+var cortes = [ crearCorte(4, 2, 1),  crearCorte(4, 5, 2), crearCorte(3, 3, 3)];
 
 /// por cada corte:
 cortes.forEach(function(corte){
@@ -169,3 +157,6 @@ cortes.forEach(function(corte){
     }
 
 });
+
+
+log(placa.existeAreaDisponibleDesde(punto(6,6), crearCorte(3, 3, 3)) )
